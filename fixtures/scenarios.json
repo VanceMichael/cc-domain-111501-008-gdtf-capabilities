@@ -1,0 +1,36 @@
+{
+  "entry": "/fixture",
+  "documents": [
+    {
+      "id": "fixture",
+      "path": "description.xml",
+      "format": "xml",
+      "file": "00.raw",
+      "task": "task-1",
+      "batch": "batch-local",
+      "serviceRoot": "/raw/",
+      "revision": 1
+    },
+    {
+      "id": "firmware",
+      "path": "firmware.json",
+      "format": "json",
+      "file": "01.raw",
+      "task": "task-1",
+      "batch": "batch-local",
+      "serviceRoot": "/raw/",
+      "revision": 1
+    }
+  ],
+  "changedDocument": "fixture",
+  "replaceFrom": "DMXOffset=\"5\"",
+  "replaceTo": "DMXOffset=\"9\"",
+  "expectedIds": [
+    "PixelMode:head-1:dimmer",
+    "PixelMode:head-2:dimmer"
+  ],
+  "transmissionWindow": [
+    "2026-10-31T23:00:00Z",
+    "2026-11-01T01:00:00Z"
+  ]
+}
