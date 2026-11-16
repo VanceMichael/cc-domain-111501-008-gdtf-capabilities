@@ -1,0 +1,30 @@
+{
+  "entry": "/fixture",
+  "scenario": "anomaly",
+  "documents": [
+    {
+      "id": "anomaly-fixture",
+      "path": "anomaly-description.xml",
+      "format": "xml",
+      "file": "10.raw",
+      "task": "task-2",
+      "batch": "batch-local",
+      "serviceRoot": "/raw/",
+      "revision": 1
+    },
+    {
+      "id": "anomaly-firmware",
+      "path": "anomaly-firmware.json",
+      "format": "json",
+      "file": "11.raw",
+      "task": "task-2",
+      "batch": "batch-local",
+      "serviceRoot": "/raw/",
+      "revision": 1
+    }
+  ],
+  "changedDocument": "anomaly-fixture",
+  "round2Raw": "12.raw",
+  "replaceFrom": "DMXOffset=\"9\"",
+  "replaceTo": "DMXOffset=\"13\""
+}

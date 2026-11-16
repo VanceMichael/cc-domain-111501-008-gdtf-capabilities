@@ -12,13 +12,15 @@ npm test
 npm run demo
 ```
 
-build逐个检查src、simulator、scripts、test、acceptance内的ESM语法；test验证旧版预览、来源HTTP缓存与故障响应、存储重开。demo当场创建空目录并启动真实回环HTTP服务、调用采集器后打印取得的记录、来源证据和请求列表；结束时关闭服务并清理临时目录。它不是日志回放，也不会把预览结果说成完整接入。固定小样本预计数秒，可在90秒内现场展示。
+build逐个检查src、simulator、scripts、test、acceptance内的ESM语法；test验证解释器纯逻辑、旧版预览、来源HTTP缓存与故障响应、存储重开。demo当场创建空目录并启动真实回环HTTP服务、连续调用三次managed采集（首次、重复投递、固件修订），打印当前通道记录、新旧版本的head-2地址解释、来源证据和请求列表；结束时关闭服务并清理临时目录。它不是日志回放，也不会把预览结果说成完整接入。固定小样本预计数秒，可在90秒内现场展示。
 
 ## 调用边界
 
-`collect({base,repository,mode})`是采集入口，默认旧预览模式；`mode:'managed'`供上层请求结构化接入。返回值延续imported和complete，complete只能表示协议下已核对的完成状态，不可由HTTP200或预览成功推断。`Repository`中的records、evidence、cursors、notes是现有持久化接口，可为业务一致性扩展结构及事务；旧记录和原始字节应继续可读。
+`collect({base,repository,mode})`是采集入口，默认旧预览模式；`mode:'managed'`供上层请求结构化接入。返回值延续imported和complete，complete只能表示协议下已核对的完成状态，不可由HTTP200或预览成功推断。`Repository`中的records、evidence、cursors、notes是现有持久化接口，另扩展index（已取得文件索引）、interpretations（按“文档:摘要”版本化的解释）、pending（已留存未解释或待补件的待办）三个桶及对应访问器；旧记录和原始字节继续可读，旧存储重开时自动补齐新桶默认值。
 
-`createSource({scenario:'legacy'|'feature'})`创建本地来源，提供base/state/requests/close；legacy只含首个文件，feature开放整组关联资料。测试用state.round、failDoc、missingDoc驱动来源变动，采集端只经HTTP观察这些变化，不读取模拟器内部数据。详细字段及公开行为矩阵见协议。
+managed采集只输出各模式能解释的控制地址和功能依据，不做灯光渲染、不向设备发指令。`src/gdtf.mjs`是无第三方依赖的profile解释器：几何模板被多次引用时按各实例的Break基址分别计算地址，模板本身不产生通道记录；DMXFrom保留`分子/字节数`原始精度；ChannelFunction的ModeMaster/ModeFrom切换条件、ChannelSet区间随功能记录保留；缺引用、未声明break、同字节地址冲突进入unresolved/conflict/uncertain，profile外字段隔离到unknown，均不静默覆盖。
+
+`createSource({scenario:'legacy'|'feature'|'anomaly'|'anomaly-legacy'})`创建本地来源，提供base/state/requests/close；legacy只含首个文件，feature开放整组关联资料，anomaly开放含多break、多模式、功能切换、地址冲突、缺引用的合成资料并在round=2提供新增模式与偏移修订的独立原始件。测试用state.round、failDoc、missingDoc驱动来源变动，采集端只经HTTP观察这些变化，不读取模拟器内部数据。详细字段及公开行为矩阵见协议。
 
 ## 特性验收与恢复
 
@@ -26,7 +28,7 @@ build逐个检查src、simulator、scripts、test、acceptance内的ESM语法；
 npm run acceptance
 ```
 
-acceptance与基线回归分开。当前预览器尚不产生结构化业务关系，因此其中两项业务断言预期失败；这是新增能力，不是依赖或启动问题。请按协议增加缺件、引用冲突、修订、数据边界及进程终止恢复的测试，不能删断言、固定输出样本答案或让原始证据与规范化结果错位。
+acceptance与基线回归分开。`acceptance/managed.test.mjs`覆盖正例（实例地址、粗细字节、重开重投），`acceptance/managed-anomaly.test.mjs`按协议验证矩阵覆盖：跨文件几何实例与多break关联、缺引用与地址冲突的不确定保留、503临时失败与404缺件的待办与补件、round=2固件修订的新旧解释版本化、原始证据已留存而关系未提交时的进程终止恢复。不能删断言、固定输出样本答案或让原始证据与规范化结果错位。
 
 ## 离线容器
 
